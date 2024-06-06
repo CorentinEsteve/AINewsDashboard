@@ -1,26 +1,38 @@
-import React, {useEffect, useState} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ActivityIndicator,
-  View,
-  Text,
-} from 'react-native';
+/* eslint-disable prettier/prettier */
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, ActivityIndicator, View, Text } from 'react-native';
 import axios from 'axios';
 import NewsList from '../components/NewsList';
 
 // HomeScreen to fetch and display a list of AI news articles
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get(
-          'https://newsapi.org/v2/everything?q=AI&apiKey=f5a64c85bd3848cd98c69a6f5be173f0',
+        const response = await axios.get('https://newsapi.org/v2/everything?q=AI&apiKey=f5a64c85bd3848cd98c69a6f5be173f0');
+        // Filter out articles with '[Removed]' in the title or description
+        const filteredArticles = response.data.articles.filter(
+          article => !article.title.includes('[Removed]') && !article.description.includes('[Removed]')
         );
-        setNews(response.data.articles);
+
+        // Check for articles that are accessible
+        const accessibleArticles = await Promise.all(filteredArticles.map(async (article) => {
+          try {
+            await axios.get(article.url); // Try fetching the article
+            return article;
+          } catch (error) {
+            if (error.response && error.response.status === 401) {
+              // If the article returns a 401 error, skip it
+              return null;
+            }
+            return article; // Include the article for other errors or success
+          }
+        }));
+
+        setNews(accessibleArticles.filter(article => article !== null));
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -31,8 +43,8 @@ const HomeScreen = ({navigation}) => {
     fetchNews();
   }, []);
 
-  const handleArticlePress = article => {
-    navigation.navigate('Article', {article});
+  const handleArticlePress = (article) => {
+    navigation.navigate('Article', { article });
   };
 
   if (loading) {

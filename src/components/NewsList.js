@@ -25,12 +25,14 @@ const NewsList = ({articles, onArticlePress}) => {
 
 const styles = StyleSheet.create({
   newsItem: {
-    padding: 10,
+    padding: 15,
+    paddingHorizontal: 30,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   title: {
     fontSize: 18,
+    paddingBottom: 5,
     fontWeight: 'bold',
   },
   description: {
