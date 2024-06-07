@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 
 // NewsList component to display list of news articles
-const NewsList = ({articles, onArticlePress}) => {
-  const renderItem = ({item, index}) => (
+const NewsList = ({ articles, onArticlePress }) => {
+  const renderItem = ({ item, index }) => (
     <TouchableOpacity onPress={() => onArticlePress(item)} key={index}>
       <View style={styles.newsItem}>
         <Text style={styles.title}>{item.title}</Text>

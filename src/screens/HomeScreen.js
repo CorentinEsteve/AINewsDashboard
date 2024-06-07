@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, ActivityIndicator, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  ActivityIndicator,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NewsList from '../components/NewsList';
 
 // HomeScreen to fetch and display a list of AI news articles
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('AI'); // Default keyword is 'AI'
@@ -16,25 +25,33 @@ const HomeScreen = ({ navigation }) => {
     fetchNews(keyword);
   }, [keyword]);
 
-  const fetchNews = async (keyword) => {
+  const fetchNews = async keyword => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://newsapi.org/v2/everything?q=${keyword}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`);
+      const response = await axios.get(
+        `https://newsapi.org/v2/everything?q=${keyword}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`,
+      );
       const filteredArticles = response.data.articles.filter(
-        article => article.title && !article.title.includes('[Removed]') && article.description && !article.description.includes('[Removed]')
+        article =>
+          article.title &&
+          !article.title.includes('[Removed]') &&
+          article.description &&
+          !article.description.includes('[Removed]'),
       );
 
-      const accessibleArticles = await Promise.all(filteredArticles.map(async (article) => {
-        try {
-          await axios.get(article.url);
-          return article;
-        } catch (error) {
-          if (error.response && error.response.status === 401) {
-            return null;
+      const accessibleArticles = await Promise.all(
+        filteredArticles.map(async article => {
+          try {
+            await axios.get(article.url);
+            return article;
+          } catch (error) {
+            if (error.response && error.response.status === 401) {
+              return null;
+            }
+            return article;
           }
-          return article;
-        }
-      }));
+        }),
+      );
 
       setNews(accessibleArticles.filter(article => article !== null));
       setLoading(false);
@@ -57,11 +74,11 @@ const HomeScreen = ({ navigation }) => {
     setPlaceholder('Enter keyword');
   };
 
-  const handleArticlePress = (article) => {
-    navigation.navigate('Article', { article });
+  const handleArticlePress = article => {
+    navigation.navigate('Article', {article});
   };
 
-  const handleTagPress = (tag) => {
+  const handleTagPress = tag => {
     setSearchText('');
     setKeyword(tag);
     setPlaceholder(tag);
@@ -90,14 +107,22 @@ const HomeScreen = ({ navigation }) => {
           returnKeyType="search"
         />
         {searchText.length > 0 && (
-          <TouchableOpacity onPress={handleClearSearch} style={styles.clearButton}>
+          <TouchableOpacity
+            onPress={handleClearSearch}
+            style={styles.clearButton}>
             <Icon name="cancel" size={20} color="#888" />
           </TouchableOpacity>
         )}
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagsContainer}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tagsContainer}>
         {tags.map(tag => (
-          <TouchableOpacity key={tag} style={styles.tag} onPress={() => handleTagPress(tag)}>
+          <TouchableOpacity
+            key={tag}
+            style={styles.tag}
+            onPress={() => handleTagPress(tag)}>
             <Text style={styles.tagText}>{tag}</Text>
           </TouchableOpacity>
         ))}
@@ -106,7 +131,9 @@ const HomeScreen = ({ navigation }) => {
         <NewsList articles={news} onArticlePress={handleArticlePress} />
       ) : (
         <View style={styles.noResultsContainer}>
-          <Text style={styles.noResultsText}>No results found. Try a different keyword.</Text>
+          <Text style={styles.noResultsText}>
+            No results found. Try a different keyword.
+          </Text>
         </View>
       )}
     </SafeAreaView>
