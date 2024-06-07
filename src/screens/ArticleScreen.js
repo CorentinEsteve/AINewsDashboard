@@ -89,6 +89,7 @@ const ArticleScreen = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerIcons}>
+        <Text style={styles.source}>Source: {article.source.name}</Text>
         <TouchableOpacity onPress={handleSaveArticle} style={styles.iconButton}>
           <Icon name={isSaved ? "bookmark" : "bookmark-border"} size={28} color="black" />
         </TouchableOpacity>
@@ -97,7 +98,6 @@ const ArticleScreen = ({ route }) => {
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.source}>Source: {article.source.name}</Text>
         <Text style={styles.title}>{article.title}</Text>
         {content.map((element, index) => {
           if (element.type === 'text') {
@@ -120,9 +120,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     padding: 10,
+    marginRight: 20,
   },
   iconButton: {
-    marginHorizontal: 10,
+    marginHorizontal: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -140,21 +141,25 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 30,
-    paddingBottom: 30, // Ensure padding at the bottom
+    paddingTop: 20, // Ensure padding at the bottom
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
+    color: '#333',
   },
   source: {
     fontSize: 14,
     color: '#fff',
-    backgroundColor: '#888',
+    backgroundColor: '#607D8B',
     padding: 5,
+    paddingHorizontal: 10,
     borderRadius: 5,
     alignSelf: 'flex-start',
     marginBottom: 10,
+    marginRight: 'auto',
+    marginLeft: 20,
   },
   content: {
     fontSize: 16,

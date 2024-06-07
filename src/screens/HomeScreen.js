@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -8,13 +8,14 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NewsList from '../components/NewsList';
 
 // HomeScreen to fetch and display a list of AI news articles
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('AI'); // Default keyword is 'AI'
@@ -75,7 +76,7 @@ const HomeScreen = ({navigation}) => {
   };
 
   const handleArticlePress = article => {
-    navigation.navigate('Article', {article});
+    navigation.navigate('Article', { article });
   };
 
   const handleTagPress = tag => {
@@ -89,7 +90,7 @@ const HomeScreen = ({navigation}) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#2f5689" />
         <Text>Loading news...</Text>
       </View>
     );
@@ -97,6 +98,7 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -143,12 +145,20 @@ const HomeScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ECEFF1',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 10,
+  },
+  logo: {
+    width: 200,
+    height: 130,
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 10,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -175,10 +185,10 @@ const styles = StyleSheet.create({
   },
   tag: {
     backgroundColor: '#ddd',
-    minHeight: 30,
+    height: 30,
     paddingVertical: 5,
     paddingHorizontal: 15,
-    marginBottom: 10,
+    marginBottom: 40,
     borderRadius: 15,
     marginRight: 10,
   },
@@ -188,11 +198,11 @@ const styles = StyleSheet.create({
   },
   noResultsContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'top',
     alignItems: 'center',
   },
   noResultsText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#888',
   },
 });

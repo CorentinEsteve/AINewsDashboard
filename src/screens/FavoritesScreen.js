@@ -15,7 +15,11 @@ const FavoritesScreen = () => {
   return (
     <View style={styles.container}>
       {favoriteArticles.length === 0 ? (
-        <Text>No favorite articles</Text>
+        <View style={styles.noResultsContainer}>
+            <Text style={styles.noResultsText}>
+                No favorite article.
+            </Text>
+        </View>
       ) : (
         <NewsList articles={favoriteArticles} onArticlePress={handleArticlePress} />
       )}
@@ -26,7 +30,17 @@ const FavoritesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    paddingTop: 1,
+    backgroundColor: '#ECEFF1',
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    fontSize: 16,
+    color: '#888',
   },
 });
 

@@ -15,7 +15,11 @@ const SavedScreen = () => {
   return (
     <View style={styles.container}>
       {savedArticles.length === 0 ? (
-        <Text>No saved articles</Text>
+        <View style={styles.noResultsContainer}>
+            <Text style={styles.noResultsText}>
+                No saved article.
+            </Text>
+        </View>
       ) : (
         <NewsList articles={savedArticles} onArticlePress={handleArticlePress} />
       )}
@@ -26,7 +30,17 @@ const SavedScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    paddingTop: 1,
+    backgroundColor: '#ECEFF1',
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    fontSize: 16,
+    color: '#888',
   },
 });
 

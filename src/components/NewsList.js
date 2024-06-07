@@ -29,11 +29,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 18,
     paddingBottom: 5,
     fontWeight: 'bold',
+    color: '#333',
   },
   description: {
     fontSize: 14,
