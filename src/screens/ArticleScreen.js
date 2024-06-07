@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { SafeAreaView, StyleSheet, ActivityIndicator, View, Text, ScrollView, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, ActivityIndicator, View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import cheerio from 'cheerio';
@@ -30,10 +30,11 @@ const ArticleScreen = ({ route }) => {
         const elements = [];
 
         $(articleContent).find('p, img').each((i, el) => {
+          const src = $(el).attr('src');
           if (el.tagName === 'p') {
             elements.push({ type: 'text', content: $(el).text() });
-          } else if (el.tagName === 'img') {
-            elements.push({ type: 'image', src: $(el).attr('src') });
+          } else if (el.tagName === 'img' && src && !src.endsWith('.gif') && isValidImageURL(src)) { // Exclude GIFs and invalid URLs
+            elements.push({ type: 'image', src });
           }
         });
 
@@ -62,6 +63,10 @@ const ArticleScreen = ({ route }) => {
     } else {
       favoriteArticle(article);
     }
+  };
+
+  const isValidImageURL = (url) => {
+    return url && (url.startsWith('http://') || url.startsWith('https://'));
   };
 
   if (loading) {
@@ -98,7 +103,7 @@ const ArticleScreen = ({ route }) => {
           if (element.type === 'text') {
             return <Text key={index} style={styles.content}>{element.content}</Text>;
           } else if (element.type === 'image') {
-            return <Image key={index} source={{ uri: element.src }} style={styles.image} />;
+            return <Image key={index} source={{ uri: element.src }} style={styles.image} onError={() => console.log(`Failed to load image: ${element.src}`)} />;
           }
         })}
       </ScrollView>

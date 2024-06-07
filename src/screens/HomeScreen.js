@@ -156,7 +156,8 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
-    margin: 10,
+    marginHorizontal: 20,
+    marginVertical: 10,
   },
   searchInput: {
     flex: 1,
@@ -170,12 +171,14 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   tagsContainer: {
-    paddingHorizontal: 10,
+    marginHorizontal: 20,
   },
   tag: {
     backgroundColor: '#ddd',
+    minHeight: 30,
     paddingVertical: 5,
     paddingHorizontal: 15,
+    marginBottom: 10,
     borderRadius: 15,
     marginRight: 10,
   },

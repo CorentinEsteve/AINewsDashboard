@@ -26,7 +26,7 @@ const NewsList = ({ articles, onArticlePress }) => {
 const styles = StyleSheet.create({
   newsItem: {
     padding: 15,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
