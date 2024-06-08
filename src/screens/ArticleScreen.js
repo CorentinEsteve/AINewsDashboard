@@ -118,7 +118,7 @@ const ArticleScreen = ({route}) => {
           <Icon
             name={isSaved ? 'bookmark' : 'bookmark-border'}
             size={28}
-            color="black"
+            color="#ECEFF1"
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -161,7 +161,7 @@ const ArticleScreen = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#263238',
   },
   headerIcons: {
     flexDirection: 'row',
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
+    color: '#ECEFF1',
   },
   source: {
     fontSize: 14,
@@ -212,6 +212,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 10,
+    color: '#ECEFF1',
   },
   image: {
     width: '100%', // Full width

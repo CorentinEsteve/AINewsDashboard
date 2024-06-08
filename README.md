@@ -1,79 +1,96 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# AI News Dashboard
 
-# Getting Started
+AI News Dashboard is a React Native application designed to fetch and display AI-related news articles from multiple sources. The app displays an overview of articles on the home screen, and users can click on any article to view its detailed content. Users can also save articles to their "Saved" or "Favorites" sections for later viewing.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Features
+- Fetches news from two different APIs: News API and World News API.
+- Displays a list of news articles with titles and descriptions.
+- Allows users to view the full content of an article by clicking on it.
+- Users can save articles to their "Saved" or "Favorites" sections.
+- Search functionality to filter news articles based on keywords.
+- Horizontal scrollable list with frequently used tags for quick filtering.
+- Dark mode toggle for better readability.
+- Displays source information for each article.
 
-## Step 1: Start the Metro Server
+## Prerequisites
+- Node.js
+- npm or yarn
+- React Native CLI
+- Android Studio (for Android development)
+- Xcode (for iOS development, if applicable)
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Installation
+1. Clone the repository:
 
-To start Metro, run the following command from the _root_ of your React Native project:
+``sh
+git clone https://github.com/your-username/AI-News-Dashboard.git
+cd AI-News-Dashboard``
 
-```bash
-# using npm
-npm start
+2. Install dependencies:
 
-# OR using Yarn
-yarn start
+``sh
+npm install
+# or
+yarn install``
+
+3. Set up environment variables:
+In the root directory, add your API keys in the .env file.
+
+4. Start the development server:
+
+```sh
+npx react-native start
 ```
 
-## Step 2: Start your Application
+Run the app on an Android or iOS emulator:
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```sh
+npx react-native run-android
+# or
+npx react-native run-ios
 ```
 
-### For iOS
+## Project Structure
 
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```sh
+AI-News-Dashboard/
+├── src/
+│   ├── assets/
+│   │   └── logo.png
+│   ├── components/
+│   │   └── NewsList.js
+│   ├── context/
+│   │   └── ArticleContext.js
+│   ├── screens/
+│   │   ├── HomeScreen.js
+│   │   ├── SavedScreen.js
+│   │   ├── FavoritesScreen.js
+│   │   └── ArticleScreen.js
+│   ├── App.js
+│   └── index.js
+├── .env
+├── package.json
+└── README.md
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+## API Integration
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+### News API
+Fetches AI-related news articles from the News API.
 
-## Step 3: Modifying your App
+### World News API
+Fetches AI-related news articles from the World News API.
 
-Now that you have successfully run the app, let's modify it.
+### Combining and Sorting
+The articles from both APIs are combined and sorted by publication date to ensure a seamless user experience.
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+### Debugging
+To debug issues with HTML content in summaries, console.log statements are used to inspect the data returned by the World News API.
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+### Customizing
+Adding New Tags
+To add new tags for quick filtering, update the tags array in HomeScreen.js:
 
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+```sh
+const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft', 'YourTag'];
+```
