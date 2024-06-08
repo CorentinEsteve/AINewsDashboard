@@ -19,10 +19,10 @@ import NewsList from '../components/NewsList';
 const HomeScreen = ({navigation}) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [keyword, setKeyword] = useState('AI');
   const [searchText, setSearchText] = useState('');
   const [placeholder, setPlaceholder] = useState('Enter keyword');
-  const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
 
   const decodeHtmlEntities = text => {
@@ -38,6 +38,10 @@ const HomeScreen = ({navigation}) => {
 
   const fetchNews = useCallback(async (searchKeyword, searchPage) => {
     setLoading(true);
+    setError(null);
+    // console.log(
+    //   `Fetching news for keyword: ${searchKeyword}, page: ${searchPage}`,
+    // );
     try {
       const [response1, response2] = await Promise.allSettled([
         axios.get(
@@ -58,6 +62,8 @@ const HomeScreen = ({navigation}) => {
           return response.json();
         }),
       ]);
+
+      // console.log('Responses:', response1, response2);
 
       const articlesFromAPI1 =
         response1.status === 'fulfilled'
@@ -84,6 +90,7 @@ const HomeScreen = ({navigation}) => {
           : [];
 
       const combinedArticles = [...articlesFromAPI1, ...articlesFromAPI2];
+      // console.log('Combined articles:', combinedArticles);
 
       const filteredArticles = combinedArticles.filter(
         article =>
@@ -98,8 +105,8 @@ const HomeScreen = ({navigation}) => {
           try {
             await axios.get(article.url);
             return article;
-          } catch (error) {
-            if (error.response && error.response.status === 401) {
+          } catch (catchError) {
+            if (catchError.response && catchError.response.status === 401) {
               return null;
             }
             return article;
@@ -119,8 +126,9 @@ const HomeScreen = ({navigation}) => {
         searchPage === 1 ? validArticles : [...prevNews, ...validArticles],
       );
       setLoading(false);
-    } catch (error) {
-      console.error(error);
+    } catch (catchError) {
+      console.error('Error fetching news:', catchError);
+      setError(catchError.message);
       setLoading(false);
     }
   }, []);
@@ -134,14 +142,14 @@ const HomeScreen = ({navigation}) => {
       return;
     }
     setKeyword(searchText);
-    setPage(1);
+    fetchNews(searchText, 1); // Reset to page 1 with new keyword
   };
 
   const handleClearSearch = () => {
     setSearchText('');
     setKeyword('AI');
     setPlaceholder('Enter keyword');
-    setPage(1);
+    fetchNews('AI', 1); // Reset to page 1 with default keyword
   };
 
   const handleArticlePress = article => {
@@ -152,21 +160,18 @@ const HomeScreen = ({navigation}) => {
     setSearchText('');
     setKeyword(tag);
     setPlaceholder(tag);
-    setPage(1);
+    fetchNews(tag, 1); // Reset to page 1 with selected tag
   };
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchNews(keyword, 1).then(() => setRefreshing(false));
+    fetchNews(keyword, 1).then(() => setRefreshing(false)); // Reset to page 1 on refresh
   };
 
   const handleLoadMore = () => {
     if (!loading) {
-      setPage(prevPage => {
-        const nextPage = prevPage + 1;
-        fetchNews(keyword, nextPage);
-        return nextPage;
-      });
+      const nextPage = Math.floor(news.length / 10) + 1; // Calculate next page based on loaded articles
+      fetchNews(keyword, nextPage);
     }
   };
 
@@ -185,7 +190,11 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Image
+        source={require('../assets/logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -215,19 +224,25 @@ const HomeScreen = ({navigation}) => {
           ))}
         </ScrollView>
       </View>
-      <FlatList
-        data={news}
-        renderItem={({item}) => (
-          <NewsList articles={[item]} onArticlePress={handleArticlePress} />
-        )}
-        keyExtractor={item => item.url}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
+      {error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error: {error}</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={news}
+          renderItem={({item}) => (
+            <NewsList articles={[item]} onArticlePress={handleArticlePress} />
+          )}
+          keyExtractor={item => item.url}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -235,7 +250,7 @@ const HomeScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ECEFF1',
+    backgroundColor: '#CFD8DC',
   },
   loadingContainer: {
     flex: 1,
@@ -244,25 +259,24 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logo: {
-    width: 200,
-    height: 130,
+    width: '100%',
+    height: 30,
     alignSelf: 'center',
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 30,
+    marginBottom: 0,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#f0f0f0',
     borderRadius: 10,
     marginHorizontal: 20,
-    marginVertical: 10,
+    marginTop: 30,
+    marginBottom: 20,
   },
   searchInput: {
     flex: 1,
     padding: 5,
-    paddingLeft: 10,
+    paddingLeft: 15,
     fontSize: 16,
     borderRadius: 10,
     backgroundColor: '#fff',
@@ -272,10 +286,10 @@ const styles = StyleSheet.create({
   },
   tagsContainer: {
     marginHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   tag: {
-    backgroundColor: '#ddd',
+    backgroundColor: '#ECEFF1',
     height: 30,
     paddingVertical: 5,
     paddingHorizontal: 15,
@@ -294,6 +308,15 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 16,
     color: '#888',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
   },
 });
 

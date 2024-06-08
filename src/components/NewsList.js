@@ -27,18 +27,19 @@ const styles = StyleSheet.create({
   newsItem: {
     padding: 15,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderBottomColor: '#CFD8DC',
+    backgroundColor: '#37474F',
   },
   title: {
     fontSize: 18,
     paddingBottom: 5,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ECEFF1',
   },
   description: {
     fontSize: 14,
+    color: 'white',
   },
 });
 
