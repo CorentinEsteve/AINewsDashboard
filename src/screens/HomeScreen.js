@@ -26,20 +26,65 @@ const HomeScreen = ({ navigation }) => {
     fetchNews(keyword);
   }, [keyword]);
 
+
+// Function to remove HTML tags and decode HTML entities
+const decodeHtmlEntities = (text) => {
+    return text
+      .replace(/<\/?[^>]+(>|$)/g, "") // Remove HTML tags
+      .replace(/&amp;/g, '&')  // Replace &amp; with &
+      .replace(/&lt;/g, '<')   // Replace &lt; with <
+      .replace(/&gt;/g, '>')   // Replace &gt; with >
+      .replace(/&quot;/g, '"') // Replace &quot; with "
+      .replace(/&#39;/g, "'")  // Replace &#39; with '
+      .replace(/&nbsp;/g, ' '); // Replace &nbsp; with space
+  };
+  
   const fetchNews = async keyword => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `https://newsapi.org/v2/everything?q=${keyword}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`,
-      );
-      const filteredArticles = response.data.articles.filter(
+      const [response1, response2] = await Promise.all([
+        axios.get(`https://newsapi.org/v2/everything?q=${keyword}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`),
+        fetch(`https://api.worldnewsapi.com/search-news?text=Weather&language=en`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': 'd9c3055d6c884202bf8a802c2a1124dd'
+          }
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+      ]);
+  
+      const articlesFromAPI1 = response1.data.articles.map(article => ({
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.urlToImage,
+        publishedAt: article.publishedAt,
+        source: { name: article.source.name }
+      }));
+  
+      const articlesFromAPI2 = response2.news.map(article => ({
+        title: article.title,
+        description: decodeHtmlEntities(article.summary), // Clean HTML tags and decode entities
+        url: article.url,
+        urlToImage: article.image,
+        publishedAt: article.publish_date,
+        source: { name: article.source_country }
+      }));
+  
+      const combinedArticles = [...articlesFromAPI1, ...articlesFromAPI2];
+  
+      const filteredArticles = combinedArticles.filter(
         article =>
           article.title &&
           !article.title.includes('[Removed]') &&
           article.description &&
-          !article.description.includes('[Removed]'),
+          !article.description.includes('[Removed]')
       );
-
+  
       const accessibleArticles = await Promise.all(
         filteredArticles.map(async article => {
           try {
@@ -51,16 +96,22 @@ const HomeScreen = ({ navigation }) => {
             }
             return article;
           }
-        }),
+        })
       );
-
-      setNews(accessibleArticles.filter(article => article !== null));
+  
+      const validArticles = accessibleArticles.filter(article => article !== null);
+  
+      // Sort articles by date
+      validArticles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  
+      setNews(validArticles);
       setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);
     }
   };
+  
 
   const handleSearchSubmit = () => {
     if (searchText.trim() === '') {

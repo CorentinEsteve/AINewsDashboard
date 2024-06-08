@@ -1,14 +1,30 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { SafeAreaView, StyleSheet, ActivityIndicator, View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState, useContext} from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  ActivityIndicator,
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import cheerio from 'cheerio';
-import { ArticleContext } from '../context/ArticleContext';
+import {ArticleContext} from '../context/ArticleContext';
 
 // ArticleScreen to display the full content of a selected article
-const ArticleScreen = ({ route }) => {
-  const { article } = route.params || {}; // Handle cases where article is not passed
-  const { saveArticle, removeSavedArticle, favoriteArticle, removeFavoriteArticle, savedArticles, favoriteArticles } = useContext(ArticleContext);
+const ArticleScreen = ({route}) => {
+  const {article} = route.params || {}; // Handle cases where article is not passed
+  const {
+    saveArticle,
+    removeSavedArticle,
+    favoriteArticle,
+    removeFavoriteArticle,
+    savedArticles,
+    favoriteArticles,
+  } = useContext(ArticleContext);
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,14 +45,22 @@ const ArticleScreen = ({ route }) => {
         const articleContent = $('article').html() || $('body').html();
         const elements = [];
 
-        $(articleContent).find('p, img').each((i, el) => {
-          const src = $(el).attr('src');
-          if (el.tagName === 'p') {
-            elements.push({ type: 'text', content: $(el).text() });
-          } else if (el.tagName === 'img' && src && !src.endsWith('.gif') && isValidImageURL(src)) { // Exclude GIFs and invalid URLs
-            elements.push({ type: 'image', src });
-          }
-        });
+        $(articleContent)
+          .find('p, img')
+          .each((i, el) => {
+            const src = $(el).attr('src');
+            if (el.tagName === 'p') {
+              elements.push({type: 'text', content: $(el).text()});
+            } else if (
+              el.tagName === 'img' &&
+              src &&
+              !src.endsWith('.gif') &&
+              isValidImageURL(src)
+            ) {
+              // Exclude GIFs and invalid URLs
+              elements.push({type: 'image', src});
+            }
+          });
 
         setContent(elements);
         setLoading(false);
@@ -65,14 +89,14 @@ const ArticleScreen = ({ route }) => {
     }
   };
 
-  const isValidImageURL = (url) => {
+  const isValidImageURL = url => {
     return url && (url.startsWith('http://') || url.startsWith('https://'));
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#2f5689" />
         <Text>Loading article...</Text>
       </View>
     );
@@ -91,19 +115,42 @@ const ArticleScreen = ({ route }) => {
       <View style={styles.headerIcons}>
         <Text style={styles.source}>Source: {article.source.name}</Text>
         <TouchableOpacity onPress={handleSaveArticle} style={styles.iconButton}>
-          <Icon name={isSaved ? "bookmark" : "bookmark-border"} size={28} color="black" />
+          <Icon
+            name={isSaved ? 'bookmark' : 'bookmark-border'}
+            size={28}
+            color="black"
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleFavoriteArticle} style={styles.iconButton}>
-          <Icon name={isFavorited ? "favorite" : "favorite-border"} size={28} color="red" />
+        <TouchableOpacity
+          onPress={handleFavoriteArticle}
+          style={styles.iconButton}>
+          <Icon
+            name={isFavorited ? 'favorite' : 'favorite-border'}
+            size={28}
+            color="red"
+          />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.title}>{article.title}</Text>
         {content.map((element, index) => {
           if (element.type === 'text') {
-            return <Text key={index} style={styles.content}>{element.content}</Text>;
+            return (
+              <Text key={index} style={styles.content}>
+                {element.content}
+              </Text>
+            );
           } else if (element.type === 'image') {
-            return <Image key={index} source={{ uri: element.src }} style={styles.image} onError={() => console.log(`Failed to load image: ${element.src}`)} />;
+            return (
+              <Image
+                key={index}
+                source={{uri: element.src}}
+                style={styles.image}
+                onError={() =>
+                  console.log(`Failed to load image: ${element.src}`)
+                }
+              />
+            );
           }
         })}
       </ScrollView>
