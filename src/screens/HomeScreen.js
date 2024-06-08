@@ -7,44 +7,45 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Image
+  FlatList,
+  Image,
+  RefreshControl,
+  ScrollView
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NewsList from '../components/NewsList';
 
-// HomeScreen to fetch and display a list of AI news articles
 const HomeScreen = ({ navigation }) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [keyword, setKeyword] = useState('AI'); // Default keyword is 'AI'
+  const [keyword, setKeyword] = useState('AI');
   const [searchText, setSearchText] = useState('');
-  const [placeholder, setPlaceholder] = useState('Enter keyword'); // Placeholder for search input
+  const [placeholder, setPlaceholder] = useState('Enter keyword');
+  const [page, setPage] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchNews(keyword);
+    fetchNews(keyword, 1);
   }, [keyword]);
 
-
-// Function to remove HTML tags and decode HTML entities
-const decodeHtmlEntities = (text) => {
+  const decodeHtmlEntities = (text) => {
     return text
-      .replace(/<\/?[^>]+(>|$)/g, "") // Remove HTML tags
-      .replace(/&amp;/g, '&')  // Replace &amp; with &
-      .replace(/&lt;/g, '<')   // Replace &lt; with <
-      .replace(/&gt;/g, '>')   // Replace &gt; with >
-      .replace(/&quot;/g, '"') // Replace &quot; with "
-      .replace(/&#39;/g, "'")  // Replace &#39; with '
-      .replace(/&nbsp;/g, ' '); // Replace &nbsp; with space
+      .replace(/<\/?[^>]+(>|$)/g, "") 
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, ' ');
   };
-  
-  const fetchNews = async keyword => {
+
+  const fetchNews = async (keyword, page) => {
     setLoading(true);
     try {
-      const [response1, response2] = await Promise.all([
-        axios.get(`https://newsapi.org/v2/everything?q=${keyword}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`),
-        fetch(`https://api.worldnewsapi.com/search-news?text=Weather&language=en`, {
+      const [response1, response2] = await Promise.allSettled([
+        axios.get(`https://newsapi.org/v2/everything?q=${keyword}&pageSize=10&page=${page}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`),
+        fetch(`https://api.worldnewsapi.com/search-news?text=Weather&language=en&limit=10&page=${page}`, {
           method: 'GET',
           headers: {
             'x-api-key': 'd9c3055d6c884202bf8a802c2a1124dd'
@@ -56,27 +57,27 @@ const decodeHtmlEntities = (text) => {
           return response.json();
         })
       ]);
-  
-      const articlesFromAPI1 = response1.data.articles.map(article => ({
+
+      const articlesFromAPI1 = response1.status === 'fulfilled' ? response1.value.data.articles.map(article => ({
         title: article.title,
         description: article.description,
         url: article.url,
         urlToImage: article.urlToImage,
         publishedAt: article.publishedAt,
         source: { name: article.source.name }
-      }));
-  
-      const articlesFromAPI2 = response2.news.map(article => ({
+      })) : [];
+
+      const articlesFromAPI2 = response2.status === 'fulfilled' ? response2.value.news.map(article => ({
         title: article.title,
-        description: decodeHtmlEntities(article.summary), // Clean HTML tags and decode entities
+        description: decodeHtmlEntities(article.summary),
         url: article.url,
         urlToImage: article.image,
         publishedAt: article.publish_date,
         source: { name: article.source_country }
-      }));
-  
+      })) : [];
+
       const combinedArticles = [...articlesFromAPI1, ...articlesFromAPI2];
-  
+
       const filteredArticles = combinedArticles.filter(
         article =>
           article.title &&
@@ -84,7 +85,7 @@ const decodeHtmlEntities = (text) => {
           article.description &&
           !article.description.includes('[Removed]')
       );
-  
+
       const accessibleArticles = await Promise.all(
         filteredArticles.map(async article => {
           try {
@@ -98,32 +99,32 @@ const decodeHtmlEntities = (text) => {
           }
         })
       );
-  
+
       const validArticles = accessibleArticles.filter(article => article !== null);
-  
-      // Sort articles by date
+
       validArticles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-  
-      setNews(validArticles);
+
+      setNews(prevNews => page === 1 ? validArticles : [...prevNews, ...validArticles]);
       setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);
     }
   };
-  
 
   const handleSearchSubmit = () => {
     if (searchText.trim() === '') {
       return;
     }
     setKeyword(searchText);
+    setPage(1);
   };
 
   const handleClearSearch = () => {
     setSearchText('');
     setKeyword('AI');
     setPlaceholder('Enter keyword');
+    setPage(1);
   };
 
   const handleArticlePress = article => {
@@ -134,18 +135,34 @@ const decodeHtmlEntities = (text) => {
     setSearchText('');
     setKeyword(tag);
     setPlaceholder(tag);
+    setPage(1);
   };
 
-  const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft'];
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchNews(keyword, 1).then(() => setRefreshing(false));
+  };
 
-  if (loading) {
+  const handleLoadMore = () => {
+    if (!loading) {
+      setPage(prevPage => {
+        const nextPage = prevPage + 1;
+        fetchNews(keyword, nextPage);
+        return nextPage;
+      });
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loading) return null;
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#2f5689" />
-        <Text>Loading news...</Text>
       </View>
     );
-  }
+  };
+
+  const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft'];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -167,28 +184,34 @@ const decodeHtmlEntities = (text) => {
           </TouchableOpacity>
         )}
       </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tagsContainer}>
-        {tags.map(tag => (
-          <TouchableOpacity
-            key={tag}
-            style={styles.tag}
-            onPress={() => handleTagPress(tag)}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      {news.length > 0 ? (
-        <NewsList articles={news} onArticlePress={handleArticlePress} />
-      ) : (
-        <View style={styles.noResultsContainer}>
-          <Text style={styles.noResultsText}>
-            No results found. Try a different keyword.
-          </Text>
-        </View>
-      )}
+      <View style={styles.tagsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {tags.map(tag => (
+            <TouchableOpacity
+              key={tag}
+              style={styles.tag}
+              onPress={() => handleTagPress(tag)}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+      <FlatList
+        data={news}
+        renderItem={({ item }) => (
+          <NewsList articles={[item]} onArticlePress={handleArticlePress} />
+        )}
+        keyExtractor={item => item.url}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -233,13 +256,13 @@ const styles = StyleSheet.create({
   },
   tagsContainer: {
     marginHorizontal: 20,
+    marginBottom: 10,
   },
   tag: {
     backgroundColor: '#ddd',
     height: 30,
     paddingVertical: 5,
     paddingHorizontal: 15,
-    marginBottom: 40,
     borderRadius: 15,
     marginRight: 10,
   },
