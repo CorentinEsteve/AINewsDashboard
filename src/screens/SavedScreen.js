@@ -1,27 +1,28 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { ArticleContext } from '../context/ArticleContext';
+import React, {useContext} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {ArticleContext} from '../context/ArticleContext';
 import NewsList from '../components/NewsList';
 
 const SavedScreen = () => {
-  const { savedArticles } = useContext(ArticleContext);
+  const {savedArticles} = useContext(ArticleContext);
   const navigation = useNavigation();
 
-  const handleArticlePress = (article) => {
-    navigation.navigate('Article', { article });
+  const handleArticlePress = article => {
+    navigation.navigate('Article', {article});
   };
 
   return (
     <View style={styles.container}>
       {savedArticles.length === 0 ? (
         <View style={styles.noResultsContainer}>
-            <Text style={styles.noResultsText}>
-                No saved article.
-            </Text>
+          <Text style={styles.noResultsText}>No saved article.</Text>
         </View>
       ) : (
-        <NewsList articles={savedArticles} onArticlePress={handleArticlePress} />
+        <NewsList
+          articles={savedArticles}
+          onArticlePress={handleArticlePress}
+        />
       )}
     </View>
   );
