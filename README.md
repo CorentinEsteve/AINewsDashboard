@@ -21,29 +21,31 @@ AI News Dashboard is a React Native application designed to fetch and display AI
 ## Installation
 1. Clone the repository:
 
-``sh
+```
 git clone https://github.com/your-username/AI-News-Dashboard.git
-cd AI-News-Dashboard``
+cd AI-News-Dashboard
+```
 
 2. Install dependencies:
 
-``sh
+```
 npm install
 # or
-yarn install``
+yarn install
+```
 
 3. Set up environment variables:
 In the root directory, add your API keys in the .env file.
 
 4. Start the development server:
 
-```sh
+```
 npx react-native start
 ```
 
 Run the app on an Android or iOS emulator:
 
-```sh
+```
 npx react-native run-android
 # or
 npx react-native run-ios
@@ -51,7 +53,7 @@ npx react-native run-ios
 
 ## Project Structure
 
-```sh
+```
 AI-News-Dashboard/
 ├── src/
 │   ├── assets/
@@ -92,6 +94,6 @@ To debug issues with HTML content in summaries, console.log statements are used 
 Adding New Tags
 To add new tags for quick filtering, update the tags array in HomeScreen.js:
 
-```sh
+```
 const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft', 'YourTag'];
 ```
