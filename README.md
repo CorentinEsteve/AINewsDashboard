@@ -9,7 +9,6 @@ AI News Dashboard is a React Native application designed to fetch and display AI
 - Users can save articles to their "Saved" or "Favorites" sections.
 - Search functionality to filter news articles based on keywords.
 - Horizontal scrollable list with frequently used tags for quick filtering.
-- Dark mode toggle for better readability.
 - Displays source information for each article.
 
 ## Prerequisites
@@ -66,8 +65,8 @@ AI-News-Dashboard/
 │   │   ├── SavedScreen.js
 │   │   ├── FavoritesScreen.js
 │   │   └── ArticleScreen.js
-│   ├── App.js
-│   └── index.js
+│   └── App.js
+├── index.js
 ├── .env
 ├── package.json
 └── README.md
@@ -77,12 +76,14 @@ AI-News-Dashboard/
 
 ### News API
 Fetches AI-related news articles from the News API.
+Documentation: https://newsapi.org/docs
 
 ### World News API
 Fetches AI-related news articles from the World News API.
+Documentation: https://worldnewsapi.com/docs/
 
 ### Combining and Sorting
-The articles from both APIs are combined and sorted by publication date to ensure a seamless user experience.
+The articles from both APIs are combined and sorted by publication date.
 
 ### Debugging
 To debug issues with HTML content in summaries, console.log statements are used to inspect the data returned by the World News API.

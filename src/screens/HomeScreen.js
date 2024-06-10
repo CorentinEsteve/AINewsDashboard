@@ -19,11 +19,13 @@ import NewsList from '../components/NewsList';
 const HomeScreen = ({navigation}) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [keyword, setKeyword] = useState('AI');
   const [searchText, setSearchText] = useState('');
   const [placeholder, setPlaceholder] = useState('Enter keyword');
   const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1); // Track the current page
 
   const decodeHtmlEntities = text => {
     return text
@@ -37,22 +39,27 @@ const HomeScreen = ({navigation}) => {
   };
 
   const fetchNews = useCallback(async (searchKeyword, searchPage) => {
-    setLoading(true);
+    const NEWS_API_KEY = process.env.NEWS_API_KEY;
+    const WORLD_NEWS_API_KEY = process.env.WORLD_NEWS_API_KEY;
+
+    if (searchPage === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     setError(null);
-    // console.log(
-    //   `Fetching news for keyword: ${searchKeyword}, page: ${searchPage}`,
-    // );
+    // const startTime = new Date().getTime();
     try {
       const [response1, response2] = await Promise.allSettled([
         axios.get(
-          `https://newsapi.org/v2/everything?q=${searchKeyword}&pageSize=10&page=${searchPage}&apiKey=f5a64c85bd3848cd98c69a6f5be173f0`,
+          `https://newsapi.org/v2/everything?q=${searchKeyword}&pageSize=10&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
         ),
         fetch(
           `https://api.worldnewsapi.com/search-news?text=${searchKeyword}&language=en&limit=10&page=${searchPage}`,
           {
             method: 'GET',
             headers: {
-              'x-api-key': 'd9c3055d6c884202bf8a802c2a1124dd',
+              'x-api-key': WORLD_NEWS_API_KEY,
             },
           },
         ).then(response => {
@@ -63,13 +70,11 @@ const HomeScreen = ({navigation}) => {
         }),
       ]);
 
-      // console.log('Responses:', response1, response2);
-
       const articlesFromAPI1 =
         response1.status === 'fulfilled'
           ? response1.value.data.articles.map(article => ({
               title: article.title,
-              description: article.description,
+              description: article.description || '',
               url: article.url,
               urlToImage: article.urlToImage,
               publishedAt: article.publishedAt,
@@ -81,7 +86,7 @@ const HomeScreen = ({navigation}) => {
         response2.status === 'fulfilled'
           ? response2.value.news.map(article => ({
               title: article.title,
-              description: decodeHtmlEntities(article.summary),
+              description: decodeHtmlEntities(article.summary || ''),
               url: article.url,
               urlToImage: article.image,
               publishedAt: article.publish_date,
@@ -90,7 +95,6 @@ const HomeScreen = ({navigation}) => {
           : [];
 
       const combinedArticles = [...articlesFromAPI1, ...articlesFromAPI2];
-      // console.log('Combined articles:', combinedArticles);
 
       const filteredArticles = combinedArticles.filter(
         article =>
@@ -126,10 +130,16 @@ const HomeScreen = ({navigation}) => {
         searchPage === 1 ? validArticles : [...prevNews, ...validArticles],
       );
       setLoading(false);
+      setLoadingMore(false);
+      setRefreshing(false);
+      // const endTime = new Date().getTime();
+      // console.log(`Request duration: ${endTime - startTime} ms`);
     } catch (catchError) {
       console.error('Error fetching news:', catchError);
       setError(catchError.message);
       setLoading(false);
+      setLoadingMore(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -141,15 +151,15 @@ const HomeScreen = ({navigation}) => {
     if (searchText.trim() === '') {
       return;
     }
+    setPage(1);
     setKeyword(searchText);
-    fetchNews(searchText, 1); // Reset to page 1 with new keyword
   };
 
   const handleClearSearch = () => {
     setSearchText('');
+    setPage(1);
     setKeyword('AI');
     setPlaceholder('Enter keyword');
-    fetchNews('AI', 1); // Reset to page 1 with default keyword
   };
 
   const handleArticlePress = article => {
@@ -158,25 +168,27 @@ const HomeScreen = ({navigation}) => {
 
   const handleTagPress = tag => {
     setSearchText('');
+    setPage(1);
     setKeyword(tag);
     setPlaceholder(tag);
-    fetchNews(tag, 1); // Reset to page 1 with selected tag
   };
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchNews(keyword, 1).then(() => setRefreshing(false)); // Reset to page 1 on refresh
+    setPage(1);
+    fetchNews(keyword, 1);
   };
 
   const handleLoadMore = () => {
-    if (!loading) {
-      const nextPage = Math.floor(news.length / 10) + 1; // Calculate next page based on loaded articles
+    if (!loadingMore) {
+      const nextPage = page + 1; // Calculate next page based on current page
+      setPage(nextPage);
       fetchNews(keyword, nextPage);
     }
   };
 
   const renderFooter = () => {
-    if (!loading) {
+    if (!loadingMore) {
       return null;
     }
     return (
@@ -234,7 +246,7 @@ const HomeScreen = ({navigation}) => {
           renderItem={({item}) => (
             <NewsList articles={[item]} onArticlePress={handleArticlePress} />
           )}
-          keyExtractor={item => item.url}
+          keyExtractor={(item, index) => item.url + index.toString()}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
