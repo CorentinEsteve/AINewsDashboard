@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,7 +16,7 @@ import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NewsList from '../components/NewsList';
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -48,49 +48,43 @@ const HomeScreen = ({navigation}) => {
       setLoadingMore(true);
     }
     setError(null);
-    // const startTime = new Date().getTime();
+    const startTime = new Date().getTime();
     try {
       const [response1, response2] = await Promise.allSettled([
         axios.get(
           `https://newsapi.org/v2/everything?q=${searchKeyword}&pageSize=10&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
         ),
-        fetch(
+        axios.get(
           `https://api.worldnewsapi.com/search-news?text=${searchKeyword}&language=en&limit=10&page=${searchPage}`,
           {
-            method: 'GET',
             headers: {
               'x-api-key': WORLD_NEWS_API_KEY,
             },
           },
-        ).then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        }),
+        ),
       ]);
 
       const articlesFromAPI1 =
-        response1.status === 'fulfilled'
+        response1.status === 'fulfilled' && response1.value.status === 200
           ? response1.value.data.articles.map(article => ({
               title: article.title,
               description: article.description || '',
               url: article.url,
               urlToImage: article.urlToImage,
               publishedAt: article.publishedAt,
-              source: {name: article.source.name},
+              source: { name: article.source.name },
             }))
           : [];
 
       const articlesFromAPI2 =
-        response2.status === 'fulfilled'
-          ? response2.value.news.map(article => ({
+        response2.status === 'fulfilled' && response2.value.status === 200
+          ? response2.value.data.news.map(article => ({
               title: article.title,
               description: decodeHtmlEntities(article.summary || ''),
               url: article.url,
               urlToImage: article.image,
               publishedAt: article.publish_date,
-              source: {name: article.source_country},
+              source: { name: article.source_country },
             }))
           : [];
 
@@ -101,7 +95,7 @@ const HomeScreen = ({navigation}) => {
           article.title &&
           !article.title.includes('[Removed]') &&
           article.description &&
-          !article.description.includes('[Removed]'),
+          !article.description.includes('[Removed]')
       );
 
       const accessibleArticles = await Promise.all(
@@ -115,25 +109,25 @@ const HomeScreen = ({navigation}) => {
             }
             return article;
           }
-        }),
+        })
       );
 
       const validArticles = accessibleArticles.filter(
-        article => article !== null,
+        article => article !== null
       );
 
       validArticles.sort(
-        (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
+        (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
       );
 
       setNews(prevNews =>
-        searchPage === 1 ? validArticles : [...prevNews, ...validArticles],
+        searchPage === 1 ? validArticles : [...prevNews, ...validArticles]
       );
       setLoading(false);
       setLoadingMore(false);
       setRefreshing(false);
-      // const endTime = new Date().getTime();
-      // console.log(`Request duration: ${endTime - startTime} ms`);
+      const endTime = new Date().getTime();
+      console.log(`Request duration: ${endTime - startTime} ms`);
     } catch (catchError) {
       console.error('Error fetching news:', catchError);
       setError(catchError.message);
@@ -163,7 +157,7 @@ const HomeScreen = ({navigation}) => {
   };
 
   const handleArticlePress = article => {
-    navigation.navigate('Article', {article});
+    navigation.navigate('Article', { article });
   };
 
   const handleTagPress = tag => {
@@ -243,7 +237,7 @@ const HomeScreen = ({navigation}) => {
       ) : (
         <FlatList
           data={news}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <NewsList articles={[item]} onArticlePress={handleArticlePress} />
           )}
           keyExtractor={(item, index) => item.url + index.toString()}
