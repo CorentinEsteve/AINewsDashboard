@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,7 +16,7 @@ import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NewsList from '../components/NewsList';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -25,7 +25,7 @@ const HomeScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [placeholder, setPlaceholder] = useState('Enter keyword');
   const [refreshing, setRefreshing] = useState(false);
-  const [page, setPage] = useState(1); // Track the current page
+  const [page, setPage] = useState(1);
 
   const decodeHtmlEntities = text => {
     return text
@@ -52,7 +52,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       const [response1, response2] = await Promise.allSettled([
         axios.get(
-          `https://newsapi.org/v2/everything?q=${searchKeyword}&pageSize=10&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
+          `https://newsapi.org/v2/everything?q=${searchKeyword}&language=en&pageSize=10&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
         ),
         axios.get(
           `https://api.worldnewsapi.com/search-news?text=${searchKeyword}&language=en&limit=10&page=${searchPage}`,
@@ -72,7 +72,7 @@ const HomeScreen = ({ navigation }) => {
               url: article.url,
               urlToImage: article.urlToImage,
               publishedAt: article.publishedAt,
-              source: { name: article.source.name },
+              source: {name: article.source.name},
             }))
           : [];
 
@@ -84,7 +84,7 @@ const HomeScreen = ({ navigation }) => {
               url: article.url,
               urlToImage: article.image,
               publishedAt: article.publish_date,
-              source: { name: article.source_country },
+              source: {name: article.source_country},
             }))
           : [];
 
@@ -95,7 +95,7 @@ const HomeScreen = ({ navigation }) => {
           article.title &&
           !article.title.includes('[Removed]') &&
           article.description &&
-          !article.description.includes('[Removed]')
+          !article.description.includes('[Removed]'),
       );
 
       const accessibleArticles = await Promise.all(
@@ -109,19 +109,19 @@ const HomeScreen = ({ navigation }) => {
             }
             return article;
           }
-        })
+        }),
       );
 
       const validArticles = accessibleArticles.filter(
-        article => article !== null
+        article => article !== null,
       );
 
       validArticles.sort(
-        (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
+        (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
       );
 
       setNews(prevNews =>
-        searchPage === 1 ? validArticles : [...prevNews, ...validArticles]
+        searchPage === 1 ? validArticles : [...prevNews, ...validArticles],
       );
       setLoading(false);
       setLoadingMore(false);
@@ -157,7 +157,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleArticlePress = article => {
-    navigation.navigate('Article', { article });
+    navigation.navigate('Article', {article});
   };
 
   const handleTagPress = tag => {
@@ -175,7 +175,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleLoadMore = () => {
     if (!loadingMore) {
-      const nextPage = page + 1; // Calculate next page based on current page
+      const nextPage = page + 1;
       setPage(nextPage);
       fetchNews(keyword, nextPage);
     }
@@ -196,11 +196,7 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image
-        source={require('../assets/logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -237,7 +233,7 @@ const HomeScreen = ({ navigation }) => {
       ) : (
         <FlatList
           data={news}
-          renderItem={({ item }) => (
+          renderItem={({item}) => (
             <NewsList articles={[item]} onArticlePress={handleArticlePress} />
           )}
           keyExtractor={(item, index) => item.url + index.toString()}
@@ -270,6 +266,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 30,
     marginBottom: 0,
+    resizeMode: 'contain',
   },
   searchContainer: {
     flexDirection: 'row',
