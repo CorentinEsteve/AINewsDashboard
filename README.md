@@ -2,7 +2,7 @@
 
 AI News Dashboard is a React Native application designed to fetch and display AI-related news articles from multiple sources. The app displays an overview of articles on the home screen, and users can click on any article to view its detailed content. Users can also save articles to their "Saved" or "Favorites" sections for later viewing.
 
-![Preview Mockup](./assets/mockup.png)
+![Preview Mockup](./src/assets/mockup.png)
 
 ## Features
 - Fetches news from two different APIs: News API and World News API.
