@@ -2,6 +2,8 @@
 
 AI News Dashboard is a React Native application designed to fetch and display AI-related news articles from multiple sources. The app displays an overview of articles on the home screen, and users can click on any article to view its detailed content. Users can also save articles to their "Saved" or "Favorites" sections for later viewing.
 
+![Preview Mockup](./assets/mockup.png)
+
 ## Features
 - Fetches news from two different APIs: News API and World News API.
 - Displays a list of news articles with titles and descriptions.
@@ -87,9 +89,6 @@ Documentation: https://worldnewsapi.com/docs/
 ### Combining and Sorting
 The articles from both APIs are combined and sorted by publication date.
 
-### Debugging
-To debug issues with HTML content in summaries, console.log statements are used to inspect the data returned by the World News API.
-
 ### Customizing
 Adding New Tags
 To add new tags for quick filtering, update the tags array in HomeScreen.js:
@@ -97,3 +96,6 @@ To add new tags for quick filtering, update the tags array in HomeScreen.js:
 ```
 const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft', 'YourTag'];
 ```
+
+### Author
+Corentin Esteve
