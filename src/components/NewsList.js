@@ -3,6 +3,7 @@ import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 
 // NewsList component to display list of news articles
 const NewsList = ({articles, onArticlePress}) => {
+  // Function to render each item in the list
   const renderItem = ({item, index}) => (
     <TouchableOpacity onPress={() => onArticlePress(item)} key={index}>
       <View style={styles.newsItem}>
@@ -12,6 +13,7 @@ const NewsList = ({articles, onArticlePress}) => {
     </TouchableOpacity>
   );
 
+  // Render the FlatList component to display the list of articles
   return (
     <FlatList
       data={articles}
@@ -23,6 +25,7 @@ const NewsList = ({articles, onArticlePress}) => {
   );
 };
 
+// Styles for the NewsList component
 const styles = StyleSheet.create({
   newsItem: {
     padding: 15,

@@ -16,7 +16,9 @@ import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NewsList from '../components/NewsList';
 
+// HomeScreen component definition
 const HomeScreen = ({navigation}) => {
+  // State variables
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -27,6 +29,7 @@ const HomeScreen = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
 
+  // Function to decode HTML entities in text
   const decodeHtmlEntities = text => {
     return text
       .replace(/<\/?[^>]+(>|$)/g, '')
@@ -38,10 +41,12 @@ const HomeScreen = ({navigation}) => {
       .replace(/&nbsp;/g, ' ');
   };
 
+  // Function to fetch news from APIs
   const fetchNews = useCallback(async (searchKeyword, searchPage) => {
     const NEWS_API_KEY = process.env.NEWS_API_KEY;
     const WORLD_NEWS_API_KEY = process.env.WORLD_NEWS_API_KEY;
 
+    // Set loading states based on the page number
     if (searchPage === 1) {
       setLoading(true);
     } else {
@@ -49,7 +54,9 @@ const HomeScreen = ({navigation}) => {
     }
     setError(null);
     const startTime = new Date().getTime();
+
     try {
+      // Fetch data from both APIs
       const [response1, response2] = await Promise.allSettled([
         axios.get(
           `https://newsapi.org/v2/everything?q=${searchKeyword}&language=en&pageSize=10&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
@@ -64,6 +71,7 @@ const HomeScreen = ({navigation}) => {
         ),
       ]);
 
+      // Process the first API's response
       const articlesFromAPI1 =
         response1.status === 'fulfilled' && response1.value.status === 200
           ? response1.value.data.articles.map(article => ({
@@ -76,6 +84,7 @@ const HomeScreen = ({navigation}) => {
             }))
           : [];
 
+      // Process the second API's response
       const articlesFromAPI2 =
         response2.status === 'fulfilled' && response2.value.status === 200
           ? response2.value.data.news.map(article => ({
@@ -88,8 +97,10 @@ const HomeScreen = ({navigation}) => {
             }))
           : [];
 
+      // Combine articles from both APIs
       const combinedArticles = [...articlesFromAPI1, ...articlesFromAPI2];
 
+      // Filter out invalid articles
       const filteredArticles = combinedArticles.filter(
         article =>
           article.title &&
@@ -98,6 +109,7 @@ const HomeScreen = ({navigation}) => {
           !article.description.includes('[Removed]'),
       );
 
+      // Check accessibility of articles
       const accessibleArticles = await Promise.all(
         filteredArticles.map(async article => {
           try {
@@ -112,14 +124,17 @@ const HomeScreen = ({navigation}) => {
         }),
       );
 
+      // Filter out inaccessible articles
       const validArticles = accessibleArticles.filter(
         article => article !== null,
       );
 
+      // Sort articles by published date
       validArticles.sort(
         (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
       );
 
+      // Update state with the fetched articles
       setNews(prevNews =>
         searchPage === 1 ? validArticles : [...prevNews, ...validArticles],
       );
@@ -137,10 +152,12 @@ const HomeScreen = ({navigation}) => {
     }
   }, []);
 
+  // Fetch news when the component mounts, when 'fetchNews' or keyword change
   useEffect(() => {
     fetchNews(keyword, 1);
   }, [fetchNews, keyword]);
 
+  // Handle search submit
   const handleSearchSubmit = () => {
     if (searchText.trim() === '') {
       return;
@@ -149,6 +166,7 @@ const HomeScreen = ({navigation}) => {
     setKeyword(searchText);
   };
 
+  // Handle clear search
   const handleClearSearch = () => {
     setSearchText('');
     setPage(1);
@@ -156,10 +174,12 @@ const HomeScreen = ({navigation}) => {
     setPlaceholder('Enter keyword');
   };
 
+  // Handle article press
   const handleArticlePress = article => {
     navigation.navigate('Article', {article});
   };
 
+  // Handle tag press
   const handleTagPress = tag => {
     setSearchText('');
     setPage(1);
@@ -167,12 +187,14 @@ const HomeScreen = ({navigation}) => {
     setPlaceholder(tag);
   };
 
+  // Handle refresh
   const onRefresh = () => {
     setRefreshing(true);
     setPage(1);
     fetchNews(keyword, 1);
   };
 
+  // Handle load more
   const handleLoadMore = () => {
     if (!loadingMore) {
       const nextPage = page + 1;
@@ -181,6 +203,7 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
+  // Render footer component for loading more
   const renderFooter = () => {
     if (!loadingMore) {
       return null;
@@ -192,6 +215,7 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
+  // Define tags
   const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft'];
 
   return (
@@ -249,6 +273,7 @@ const HomeScreen = ({navigation}) => {
   );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

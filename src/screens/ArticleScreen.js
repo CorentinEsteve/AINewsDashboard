@@ -17,6 +17,8 @@ import {ArticleContext} from '../context/ArticleContext';
 // ArticleScreen to display the full content of a selected article
 const ArticleScreen = ({route}) => {
   const {article} = route.params || {}; // Handle cases where article is not passed
+
+  // Context to manage saved and favorite articles
   const {
     saveArticle,
     removeSavedArticle,
@@ -25,18 +27,23 @@ const ArticleScreen = ({route}) => {
     savedArticles,
     favoriteArticles,
   } = useContext(ArticleContext);
+
+  // State variables for content and loading status
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Check if the article is already saved or favorited
   const isSaved = savedArticles.some(a => a.url === article.url);
   const isFavorited = favoriteArticles.some(a => a.url === article.url);
 
+  // Fetch the full content of the article. If the article URL is not available, stop loading
   useEffect(() => {
     if (!article?.url) {
       setLoading(false);
       return;
     }
 
+    // Fetch full article content using Cheerio
     const fetchFullArticle = async () => {
       try {
         const response = await axios.get(article.url);
@@ -73,6 +80,7 @@ const ArticleScreen = ({route}) => {
     fetchFullArticle();
   }, [article?.url]);
 
+  // Function to handles saving or removing the article from saved list
   const handleSaveArticle = () => {
     if (isSaved) {
       removeSavedArticle(article);
@@ -81,6 +89,7 @@ const ArticleScreen = ({route}) => {
     }
   };
 
+  // Function to handle favoriting or removing the article from favorites
   const handleFavoriteArticle = () => {
     if (isFavorited) {
       removeFavoriteArticle(article);
@@ -89,10 +98,12 @@ const ArticleScreen = ({route}) => {
     }
   };
 
+  // Function to validate image URLs
   const isValidImageURL = url => {
     return url && (url.startsWith('http://') || url.startsWith('https://'));
   };
 
+  // Render loading indicator while fetching article content
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -102,6 +113,7 @@ const ArticleScreen = ({route}) => {
     );
   }
 
+  // Render error message if the article is not found or inaccessible
   if (!article) {
     return (
       <View style={styles.errorContainer}>
@@ -110,6 +122,7 @@ const ArticleScreen = ({route}) => {
     );
   }
 
+  // Render the full article content
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerIcons}>
@@ -158,6 +171,7 @@ const ArticleScreen = ({route}) => {
   );
 };
 
+// Styles for the ArticleScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -215,9 +229,9 @@ const styles = StyleSheet.create({
     color: '#ECEFF1',
   },
   image: {
-    width: '100%', // Full width
+    width: '100%',
     height: undefined,
-    aspectRatio: 1.5, // Example aspect ratio; adjust if needed
+    aspectRatio: 1.5,
     resizeMode: 'contain',
     marginBottom: 10,
   },

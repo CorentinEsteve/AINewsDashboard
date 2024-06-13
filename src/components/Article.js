@@ -11,6 +11,7 @@ const Article = ({article}) => {
   );
 };
 
+// Styles for the Article component
 const styles = StyleSheet.create({
   container: {
     padding: 10,

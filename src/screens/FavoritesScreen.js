@@ -4,10 +4,13 @@ import {useNavigation} from '@react-navigation/native';
 import {ArticleContext} from '../context/ArticleContext';
 import NewsList from '../components/NewsList';
 
+// FavoritesScreen component to display the list of favorite articles
 const FavoritesScreen = () => {
+  // Retrieve favorite articles from the ArticleContext
   const {favoriteArticles} = useContext(ArticleContext);
   const navigation = useNavigation();
 
+  // Handle the press event on an article
   const handleArticlePress = article => {
     navigation.navigate('Article', {article});
   };
@@ -28,6 +31,7 @@ const FavoritesScreen = () => {
   );
 };
 
+// Styles for the FavoritesScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

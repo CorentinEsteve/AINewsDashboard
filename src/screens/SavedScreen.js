@@ -4,10 +4,13 @@ import {useNavigation} from '@react-navigation/native';
 import {ArticleContext} from '../context/ArticleContext';
 import NewsList from '../components/NewsList';
 
+// SavedScreen component to display the list of saved articles
 const SavedScreen = () => {
+  // Retrieve saved articles from context
   const {savedArticles} = useContext(ArticleContext);
   const navigation = useNavigation();
 
+  // Handle the press event on an article
   const handleArticlePress = article => {
     navigation.navigate('Article', {article});
   };
@@ -28,6 +31,7 @@ const SavedScreen = () => {
   );
 };
 
+// Styles for the SavedScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
