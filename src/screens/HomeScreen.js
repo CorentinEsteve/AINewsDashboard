@@ -163,7 +163,7 @@ const HomeScreen = ({navigation}) => {
       return;
     }
     setPage(1);
-    setKeyword(searchText);
+    setKeyword(prevKeyword => `${prevKeyword} ${searchText}`);
   };
 
   // Handle clear search
@@ -183,7 +183,7 @@ const HomeScreen = ({navigation}) => {
   const handleTagPress = tag => {
     setSearchText('');
     setPage(1);
-    setKeyword(tag);
+    setKeyword(prevKeyword => `${prevKeyword} ${tag}`);
     setPlaceholder(tag);
   };
 
