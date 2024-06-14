@@ -228,7 +228,7 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Image source={require('../assets/logo2.png')} style={styles.logo} />
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -305,9 +305,9 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    height: 30,
+    height: 70,
     alignSelf: 'center',
-    marginTop: 30,
+    marginTop: 15,
     marginBottom: 0,
     resizeMode: 'contain',
   },
@@ -315,8 +315,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 10,
-    marginHorizontal: 40,
-    marginTop: 30,
+    marginHorizontal: 20,
+    marginTop: 20,
     marginBottom: 20,
   },
   searchInput: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingLeft: 20,
     fontSize: 16,
-    borderRadius: 30,
+    borderRadius: 10,
     backgroundColor: '#fff',
   },
   clearButton: {
