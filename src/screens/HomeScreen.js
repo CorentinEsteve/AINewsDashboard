@@ -47,6 +47,8 @@ const HomeScreen = ({navigation}) => {
 
   // Function to fetch news from APIs
   const fetchNews = useCallback(async (searchKeyword, searchPage) => {
+    console.log(`Fetching news for keyword: ${searchKeyword}`);
+
     const NEWS_API_KEY = process.env.NEWS_API_KEY;
     const WORLD_NEWS_API_KEY = process.env.WORLD_NEWS_API_KEY;
 
@@ -74,6 +76,20 @@ const HomeScreen = ({navigation}) => {
           },
         ),
       ]);
+
+      if (response1.status === 'fulfilled') {
+        console.log(`News API response status: ${response1.value.status}`);
+      } else {
+        console.error('News API request failed');
+      }
+
+      if (response2.status === 'fulfilled') {
+        console.log(
+          `World News API response status: ${response2.value.status}`,
+        );
+      } else {
+        console.error('World News API request failed');
+      }
 
       // Process the first API's response
       const articlesFromAPI1 =
@@ -104,6 +120,8 @@ const HomeScreen = ({navigation}) => {
       // Combine articles from both APIs
       const combinedArticles = [...articlesFromAPI1, ...articlesFromAPI2];
 
+      console.log(`Total articles fetched: ${combinedArticles.length}`);
+
       // Filter out invalid articles
       const filteredArticles = combinedArticles.filter(
         article =>
@@ -132,6 +150,8 @@ const HomeScreen = ({navigation}) => {
       const validArticles = accessibleArticles.filter(
         article => article !== null,
       );
+
+      console.log(`Accessible articles: ${validArticles.length}`);
 
       // Sort articles by published date
       validArticles.sort(
@@ -166,6 +186,7 @@ const HomeScreen = ({navigation}) => {
     if (searchText.trim() === '') {
       return;
     }
+    console.log(`Search submitted: ${searchText}`);
     setPage(1);
     setLoading(true); // Show loading indicator during fetch
     setKeyword(prevKeyword => `${prevKeyword} ${searchText}`);
@@ -177,6 +198,7 @@ const HomeScreen = ({navigation}) => {
 
   // Handle clear search
   const handleClearSearch = () => {
+    console.log('Search cleared');
     setSearchText('');
     setPage(1);
     setKeyword('AI');
@@ -186,11 +208,13 @@ const HomeScreen = ({navigation}) => {
 
   // Handle article press
   const handleArticlePress = article => {
+    console.log(`Article pressed: ${article.url}`);
     navigation.navigate('Article', {article});
   };
 
   // Handle tag press
   const handleTagPress = tag => {
+    console.log(`Tag pressed: ${tag}`);
     setSearchText('');
     setPage(1);
     setKeyword(prevKeyword => `${prevKeyword} ${tag}`);
@@ -200,6 +224,7 @@ const HomeScreen = ({navigation}) => {
 
   // Handle refresh
   const onRefresh = () => {
+    console.log('Refresh triggered');
     setRefreshing(true);
     setPage(1);
     fetchNews(keyword, 1);
@@ -208,6 +233,7 @@ const HomeScreen = ({navigation}) => {
   // Handle load more
   const handleLoadMore = () => {
     if (!loadingMore) {
+      console.log('Load more triggered');
       const nextPage = page + 1;
       setPage(nextPage);
       fetchNews(keyword, nextPage);
