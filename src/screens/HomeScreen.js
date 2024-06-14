@@ -28,6 +28,10 @@ const HomeScreen = ({navigation}) => {
   const [placeholder, setPlaceholder] = useState('Enter keyword');
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
+  const [activeTag, setActiveTag] = useState('AI'); // State to track the active tag
+
+  // Predefined tags
+  const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft'];
 
   // Function to decode HTML entities in text
   const decodeHtmlEntities = text => {
@@ -163,7 +167,12 @@ const HomeScreen = ({navigation}) => {
       return;
     }
     setPage(1);
+    setLoading(true); // Show loading indicator during fetch
     setKeyword(prevKeyword => `${prevKeyword} ${searchText}`);
+    // Reset active tag if the search text does not match any tag
+    if (!tags.includes(searchText)) {
+      setActiveTag(null);
+    }
   };
 
   // Handle clear search
@@ -172,6 +181,7 @@ const HomeScreen = ({navigation}) => {
     setPage(1);
     setKeyword('AI');
     setPlaceholder('Enter keyword');
+    setActiveTag('AI');
   };
 
   // Handle article press
@@ -185,6 +195,7 @@ const HomeScreen = ({navigation}) => {
     setPage(1);
     setKeyword(prevKeyword => `${prevKeyword} ${tag}`);
     setPlaceholder(tag);
+    setActiveTag(tag);
   };
 
   // Handle refresh
@@ -215,9 +226,6 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
-  // Define tags
-  const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft'];
-
   return (
     <SafeAreaView style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
@@ -243,14 +251,24 @@ const HomeScreen = ({navigation}) => {
           {tags.map(tag => (
             <TouchableOpacity
               key={tag}
-              style={styles.tag}
+              style={[styles.tag, activeTag === tag && styles.activeTag]}
               onPress={() => handleTagPress(tag)}>
-              <Text style={styles.tagText}>{tag}</Text>
+              <Text
+                style={[
+                  styles.tagText,
+                  activeTag === tag && styles.activeTagText,
+                ]}>
+                {tag}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
-      {error ? (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2f5689" />
+        </View>
+      ) : error ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Error: {error}</Text>
         </View>
@@ -297,16 +315,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 10,
-    marginHorizontal: 20,
+    marginHorizontal: 40,
     marginTop: 30,
     marginBottom: 20,
   },
   searchInput: {
     flex: 1,
     padding: 5,
-    paddingLeft: 15,
+    paddingLeft: 20,
     fontSize: 16,
-    borderRadius: 10,
+    borderRadius: 30,
     backgroundColor: '#fff',
   },
   clearButton: {
@@ -324,9 +342,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginRight: 10,
   },
+  activeTag: {
+    backgroundColor: '#0091EA',
+  },
   tagText: {
     fontSize: 14,
     color: '#333',
+  },
+  activeTagText: {
+    color: '#fff',
   },
   noResultsContainer: {
     flex: 1,

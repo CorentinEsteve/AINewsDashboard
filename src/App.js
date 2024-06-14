@@ -29,7 +29,7 @@ const screenOptions = ({route}) => ({
     // Return the icon component
     return <Icon name={iconName} size={size} color={color} />;
   },
-  tabBarActiveTintColor: '#2f5689',
+  tabBarActiveTintColor: '#0091EA',
   tabBarInactiveTintColor: 'gray',
 });
 
