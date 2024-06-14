@@ -80,7 +80,7 @@ const HomeScreen = ({navigation}) => {
       if (response1.status === 'fulfilled') {
         console.log(`News API response status: ${response1.value.status}`);
       } else {
-        console.error('News API request failed');
+        console.error('News API: ' + response1.reason);
       }
 
       if (response2.status === 'fulfilled') {
@@ -88,7 +88,7 @@ const HomeScreen = ({navigation}) => {
           `World News API response status: ${response2.value.status}`,
         );
       } else {
-        console.error('World News API request failed');
+        console.error('World News API: ' + response2.reason);
       }
 
       // Process the first API's response
