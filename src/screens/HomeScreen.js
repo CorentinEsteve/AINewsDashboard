@@ -28,7 +28,7 @@ const HomeScreen = ({navigation}) => {
   const [placeholder, setPlaceholder] = useState('Enter keyword');
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
-  const [activeTag, setActiveTag] = useState('AI'); // State to track the active tag
+  const [activeTag, setActiveTag] = useState('AI');
 
   // Predefined tags
   const tags = ['Renault', 'Apple', 'Google', 'Nvidia', 'Amazon', 'Microsoft'];
@@ -65,15 +65,10 @@ const HomeScreen = ({navigation}) => {
       // Fetch data from both APIs
       const [response1, response2] = await Promise.allSettled([
         axios.get(
-          `https://newsapi.org/v2/everything?q=${searchKeyword}&language=en&pageSize=10&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
+          `https://newsapi.org/v2/everything?q=${searchKeyword}&language=en&pageSize=5&page=${searchPage}&apiKey=${NEWS_API_KEY}`,
         ),
         axios.get(
-          `https://api.worldnewsapi.com/search-news?text=${searchKeyword}&language=en&limit=10&page=${searchPage}`,
-          {
-            headers: {
-              'x-api-key': WORLD_NEWS_API_KEY,
-            },
-          },
+          `https://api.worldnewsapi.com/search-news?text=${searchKeyword} AI&language=en&limit=5&api-key=${WORLD_NEWS_API_KEY}`,
         ),
       ]);
 
@@ -188,7 +183,7 @@ const HomeScreen = ({navigation}) => {
     }
     console.log(`Search submitted: ${searchText}`);
     setPage(1);
-    setLoading(true); // Show loading indicator during fetch
+    setLoading(true);
     setKeyword(prevKeyword => `${prevKeyword} ${searchText}`);
     // Reset active tag if the search text does not match any tag
     if (!tags.includes(searchText)) {
